@@ -1,9 +1,9 @@
 package models
 
 import (
-	"database/sql"
 	"fmt"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/kelseyhightower/envconfig"
 	_ "github.com/lib/pq"
 )
@@ -14,7 +14,7 @@ type DbEnv struct {
 	Pass string
 }
 
-var Db *sql.DB
+var Db *sqlx.DB
 
 func init() {
 	var dbEnv DbEnv
@@ -22,7 +22,7 @@ func init() {
 	// env: DB_USER -> dbEnv.User
 	ds := fmt.Sprintf("user=%s dbname=%s password=%s sslmode=disable", dbEnv.User, dbEnv.Name, dbEnv.Pass)
 	var err error
-	Db, err = sql.Open("postgres", ds)
+	Db, err = sqlx.Open("postgres", ds)
 	if err != nil {
 		panic(err)
 	}
