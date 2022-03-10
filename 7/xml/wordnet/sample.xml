@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LexicalResource>
+    <Lexicon languageCoding='ISO 639-3' label='Japanese Wordnet' language='jpn' owner='NICT' version='1.1'>
+        <LexicalEntry id ='w239520'>
+            <Lemma writtenForm='夜半' partOfSpeech='n'/>
+            <Sense id='w239520_15168185-n' synset='jpn-1.1-15168185-n'/>
+            <Sense id='w239520_15167027-n' synset='jpn-1.1-15167027-n'/>
+        </LexicalEntry>
+        <LexicalEntry id ='w234731'>
+            <Lemma writtenForm='骨膜' partOfSpeech='n'/>
+            <Sense id='w234731_05327373-n' synset='jpn-1.1-05327373-n'/>
+        </LexicalEntry>
+    </Lexicon>
+    <SenseAxes>
+        <SenseAxis id='sa_jpn-1.1-109694' relType='eq_synonym'>
+            <Target ID='jpn-1.1-10861535-n'/>
+            <Target ID='eng-30-10861535-n'/>
+        </SenseAxis>
+        <SenseAxis id='sa_jpn-1.1-109693' relType='eq_synonym'>
+            <Target ID='jpn-1.1-05188547-n'/>
+            <Target ID='eng-30-05188547-n'/>
+        </SenseAxis>
+    </SenseAxes>
+</LexicalResource>
