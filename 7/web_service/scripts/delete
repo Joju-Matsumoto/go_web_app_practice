@@ -1,0 +1,8 @@
+#!/bin/bash
+if [ $# -ne 1 ]; then
+    echo "Error: No Argument."
+    echo "Usage: ./delete :id"
+    exit 1
+fi
+
+curl -i -X DELETE http://127.0.0.1:8080/posts/$1

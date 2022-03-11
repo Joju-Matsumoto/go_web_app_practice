@@ -1,0 +1,8 @@
+#!/bin/bash
+if [ $# -ne 1 ]; then
+    echo "Error: No Argument."
+    echo "Usage: ./get :id"
+    exit 1
+fi
+
+curl -i -X GET http://127.0.0.1:8080/posts/$1

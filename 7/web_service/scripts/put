@@ -1,0 +1,8 @@
+#!/bin/bash
+if [ $# -ne 3 ]; then
+    echo "Error: No Argument."
+    echo "Usage: ./put :id :content :author"
+    exit 1
+fi
+
+curl -i -X PUT -H "Content-Type: application/json" -d "{\"content\": \"${2}\", \"author\": \"${3}\"}" http://127.0.0.1:8080/posts/$1

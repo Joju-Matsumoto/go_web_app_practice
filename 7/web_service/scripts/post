@@ -1,0 +1,7 @@
+#!/bin/bash
+if [ $# -ne 2 ]; then
+    echo "Error: 2 arguments required."
+    echo "Usage: ./post :content :author"
+fi
+
+curl -i -X POST -H "Content-Type: application/json" -d "{\"content\": \"${1}\", \"author\": \"${2}\"}" http://127.0.0.1:8080/posts
