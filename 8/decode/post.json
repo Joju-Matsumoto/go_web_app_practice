@@ -1,0 +1,26 @@
+{
+    "id": 1,
+    "content": "Hello World!",
+    "author": {
+        "id": 1,
+        "name": "joju"
+    },
+    "comments": [
+        {
+            "id": 3,
+            "content": "hi",
+            "author": {
+                "id": 2,
+                "name": "Alice"
+            }
+        },
+        {
+            "id": 6,
+            "content": "bye",
+            "author": {
+                "id": 5,
+                "name": "Bob"
+            }
+        }
+    ]
+}
