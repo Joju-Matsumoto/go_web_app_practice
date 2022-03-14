@@ -42,6 +42,7 @@ type Post struct {
 }
 
 func (post *Post) Fetch(id int) (err error) {
+	post.ID = 0
 	result := post.Db.First(&post, id)
 	err = result.Error
 	return
