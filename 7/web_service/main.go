@@ -10,17 +10,14 @@ import (
 )
 
 func main() {
-	router := httprouter.New()
-
-	router.POST("/posts", handlePost)
-	router.GET("/posts/:id", handleGet)
-	router.PUT("/posts/:id", handlePut)
-	router.DELETE("/posts/:id", handleDelete)
-
-	server := http.Server{
-		Addr:    "127.0.0.1:8080",
-		Handler: router,
+	db, err := InitDB()
+	if err != nil {
+		panic(err)
 	}
+	server := http.Server{
+		Addr: "127.0.0.1:8080",
+	}
+	http.Handle("/posts/", handleRequest(&Post{Db: db}))
 	server.ListenAndServe()
 }
 
@@ -45,39 +42,69 @@ func writeJson(w http.ResponseWriter, data interface{}) (err error) {
 	return
 }
 
-func getPostByParams(ps httprouter.Params) (post Post, err error) {
-	post = Post{}
-
-	id, err := strconv.Atoi(ps.ByName("id"))
+func getID(ps httprouter.Params) (id int, err error) {
+	id, err = strconv.Atoi(ps.ByName("id"))
 	if err != nil {
 		fmt.Println("Error strconv.Atoi:", err)
 		return
 	}
-
-	post, err = retrieve(id)
-	if err != nil {
-		return
-	}
-
 	return
 }
 
-func handleGet(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	// fmt.Println("HandleGet")
-	post, err := getPostByParams(ps)
+func handleRequest(t Text) http.Handler {
+	router := httprouter.New()
+
+	router.GET("/posts/:id", func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+		err := fetchRequestID(p, t)
+		if err != nil {
+			return
+		}
+		handleGet(w, r, t)
+	})
+	router.POST("/posts", func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+		err := handlePost(w, r, t)
+		if err != nil {
+			return
+		}
+	})
+	router.PUT("/posts/:id", func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+		err := fetchRequestID(p, t)
+		if err != nil {
+			return
+		}
+		fmt.Println("PUT:")
+		handlePut(w, r, t)
+	})
+	router.DELETE("/posts/:id", func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+		err := fetchRequestID(p, t)
+		if err != nil {
+			return
+		}
+		handleDelete(w, r, t)
+	})
+
+	return router
+}
+
+func fetchRequestID(p httprouter.Params, t Text) (err error) {
+	id, err := getID(p)
 	if err != nil {
 		return
 	}
-	writeJson(w, post)
+	err = t.Fetch(id)
+	return
 }
 
-func handlePost(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func handleGet(w http.ResponseWriter, r *http.Request, post Text) (err error) {
+	return writeJson(w, post)
+}
+
+func handlePost(w http.ResponseWriter, r *http.Request, post Text) (err error) {
 	// fmt.Println("HandlePost")
 	body, err := readBody(r)
 	if err != nil {
 		return
 	}
-	var post Post
 	err = json.Unmarshal(body, &post)
 	if err != nil {
 		return
@@ -87,14 +114,11 @@ func handlePost(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		return
 	}
 	responseOK(w)
+	return
 }
 
-func handlePut(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func handlePut(w http.ResponseWriter, r *http.Request, post Text) (err error) {
 	// fmt.Println("HandlePut")
-	post, err := getPostByParams(ps)
-	if err != nil {
-		return
-	}
 	body, err := readBody(r)
 	if err != nil {
 		return
@@ -103,23 +127,20 @@ func handlePut(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	if err != nil {
 		return
 	}
-	// fmt.Println(post)
 	err = post.Update()
 	if err != nil {
 		return
 	}
 	responseOK(w)
+	return
 }
 
-func handleDelete(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func handleDelete(w http.ResponseWriter, r *http.Request, post Text) (err error) {
 	// fmt.Println("HandleDelete")
-	post, err := getPostByParams(ps)
-	if err != nil {
-		return
-	}
 	err = post.Destroy()
 	if err != nil {
 		return
 	}
 	responseOK(w)
+	return
 }
