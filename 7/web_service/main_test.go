@@ -8,13 +8,13 @@ import (
 )
 
 type FakePost struct {
-	ID      int
+	ID      uint
 	Content string
 	Author  string
 }
 
 func (post *FakePost) Fetch(id int) (err error) {
-	post.ID = id
+	post.ID = uint(id)
 	post.Content = "Hello World!"
 	post.Author = "joju"
 	return

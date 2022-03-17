@@ -72,7 +72,7 @@ func handleRequest(t Text) http.Handler {
 		if err != nil {
 			return
 		}
-		fmt.Println("PUT:")
+		// fmt.Println("PUT:")
 		handlePut(w, r, t)
 	})
 	router.DELETE("/posts/:id", func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
@@ -96,6 +96,7 @@ func fetchRequestID(p httprouter.Params, t Text) (err error) {
 }
 
 func handleGet(w http.ResponseWriter, r *http.Request, post Text) (err error) {
+	// http.NotFound(w, r)
 	return writeJson(w, post)
 }
 
