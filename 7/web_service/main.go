@@ -17,7 +17,7 @@ func main() {
 	server := http.Server{
 		Addr: "127.0.0.1:8080",
 	}
-	http.Handle("/posts/", handleRequest(&Post{Db: db}))
+	http.Handle("/posts/", HandleRequest(&Post{Db: db}))
 	server.ListenAndServe()
 }
 
@@ -51,36 +51,52 @@ func getID(ps httprouter.Params) (id int, err error) {
 	return
 }
 
-func handleRequest(t Text) http.Handler {
+func HandleRequest(t Text) http.Handler {
 	router := httprouter.New()
 
 	router.GET("/posts/:id", func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		err := fetchRequestID(p, t)
 		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		handleGet(w, r, t)
+		err = handleGet(w, r, t)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 	})
 	router.POST("/posts", func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		err := handlePost(w, r, t)
 		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 	})
 	router.PUT("/posts/:id", func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		err := fetchRequestID(p, t)
 		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 		// fmt.Println("PUT:")
-		handlePut(w, r, t)
+		err = handlePut(w, r, t)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 	})
 	router.DELETE("/posts/:id", func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		err := fetchRequestID(p, t)
 		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		handleDelete(w, r, t)
+		err = handleDelete(w, r, t)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 	})
 
 	return router

@@ -1,51 +1,48 @@
-package main
+package main_test
 
 import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"testing"
+
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
+
+	. "github.com/Joju-Matsumoto/go_web_app_practice/7/web_service"
 )
 
-type FakePost struct {
-	ID      uint
-	Content string
-	Author  string
-}
+var _ = Describe("Testing with Ginkgo", func() {
+	var mux *http.ServeMux
+	var post *FakePost
+	var writer *httptest.ResponseRecorder
 
-func (post *FakePost) Fetch(id int) (err error) {
-	post.ID = uint(id)
-	post.Content = "Hello World!"
-	post.Author = "joju"
-	return
-}
+	BeforeEach(func() {
+		post = &FakePost{}
+		mux = http.NewServeMux()
+		mux.Handle("/posts/", HandleRequest(post))
+		writer = httptest.NewRecorder()
+	})
 
-func (post *FakePost) Create() (err error) {
-	return
-}
+	Context("Get a post using an id", func() {
+		It("should get a post", func() {
+			request, _ := http.NewRequest("GET", "/posts/1", nil)
+			mux.ServeHTTP(writer, request)
 
-func (post *FakePost) Update() (err error) {
-	return
-}
+			Expect(writer.Code).To(Equal(200))
 
-func (post *FakePost) Destroy() (err error) {
-	return
-}
+			var post Post
+			json.Unmarshal(writer.Body.Bytes(), &post)
 
-func TestHandleGet(t *testing.T) {
-	mux := http.NewServeMux()
-	mux.Handle("/posts/", handleRequest(&FakePost{}))
+			Expect(post.ID).To(Equal(uint(1)))
+		})
+	})
 
-	writer := httptest.NewRecorder()
-	request, _ := http.NewRequest("GET", "/posts/1", nil)
-	mux.ServeHTTP(writer, request)
+	Context("Get  an error if post id is not an integer", func() {
+		It("should get a HTTP 500 response", func() {
+			request, _ := http.NewRequest("GET", "/posts/hello", nil)
+			mux.ServeHTTP(writer, request)
 
-	if writer.Code != 200 {
-		t.Errorf("Response code is %v", writer.Code)
-	}
-	var post Post
-	json.Unmarshal(writer.Body.Bytes(), &post)
-	if post.ID != 1 {
-		t.Error("Cannnot retrieve JSON post")
-	}
-}
+			Expect(writer.Code).To(Equal(500))
+		})
+	})
+})

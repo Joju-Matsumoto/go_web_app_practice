@@ -26,7 +26,7 @@ func Test(t *testing.T) { TestingT(t) }
 func (s *PostTestSuite) SetUpTest(c *C) {
 	s.post = &FakePost{}
 	s.mux = http.NewServeMux()
-	s.mux.Handle("/posts/", handleRequest(s.post))
+	s.mux.Handle("/posts/", HandleRequest(s.post))
 	s.writer = httptest.NewRecorder()
 }
 
